@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ClimateMap } from '../components/Map/ClimateMap';
 import { useRealtimeData } from '../hooks/useClimateData';
-import { getTemperatureColor, getAQIColor, formatDateTime, calculateHeatIndex, getWindDirection } from '../utils/helpers';
+import { getTemperatureColor, getAQIColor, formatDateTime, calculateHeatIndex } from '../utils/helpers';
 import { Thermometer, Droplets, Wind, MapPin, Info, Activity, Globe, BarChart3, TrendingUp, Eye } from 'lucide-react';
 
 const MapPage: React.FC = () => {
@@ -14,52 +14,47 @@ const MapPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-500 to-purple-500 p-8 text-white">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-        
-        <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 bg-white/20 rounded-2xl">
-              <Globe className="h-6 w-6" />
-            </div>
-            <h1 className="text-4xl font-bold">Climate Map</h1>
+      <div className="relative overflow-hidden rounded-3xl glass-card p-6 sm:p-8 noise-overlay">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue-500/[0.07] rounded-full blur-[100px]"></div>
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-indigo-500/[0.07] rounded-full blur-[100px]"></div>
+        </div>
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="w-14 h-14 rounded-3xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/15 flex items-center justify-center">
+            <Globe className="h-7 w-7 text-blue-400" />
           </div>
-          <p className="text-blue-100 text-lg ml-14">Interactive visualization of global climate conditions</p>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Climate Map</h1>
+            <p className="text-slate-400 text-sm mt-1">Interactive visualization of global climate conditions</p>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Map */}
-        <div className="lg:col-span-3 animate-slide-up">
+        <div className="lg:col-span-3 animate-fade-in-up opacity-0 stagger-1">
           <div className="card p-0 overflow-hidden hover-lift">
-            <ClimateMap
-              height="700px"
-              onStationClick={setSelectedStation}
-            />
+            <ClimateMap height="650px" onStationClick={setSelectedStation} />
           </div>
         </div>
 
         {/* Station Details Sidebar */}
-        <div className="space-y-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <div className="space-y-4 animate-fade-in-up opacity-0 stagger-2">
           {selectedStationData ? (
             <div className="card animate-scale-in">
               {/* Station Header */}
-              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
-                <div className="p-3 bg-climate-100 rounded-2xl">
-                  <MapPin className="h-6 w-6 text-climate-600" />
+              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-white/[0.06]">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 border border-emerald-500/15 flex items-center justify-center">
+                  <MapPin className="h-5 w-5 text-emerald-400" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">
-                    {selectedStationData.station_name}
-                  </h2>
-                  <p className="text-sm text-gray-500">Station #{selectedStationData.station_id}</p>
+                  <h2 className="text-sm font-bold text-white">{selectedStationData.station_name}</h2>
+                  <p className="text-xs text-slate-500">Station #{selectedStationData.station_id}</p>
                 </div>
               </div>
 
               {/* Tabs */}
-              <div className="flex gap-2 mb-5">
+              <div className="flex gap-1.5 mb-5 p-1 bg-white/[0.03] rounded-2xl border border-white/[0.04]">
                 {[
                   { id: 'details', label: 'Details', icon: Eye },
                   { id: 'comparison', label: 'Compare', icon: BarChart3 },
@@ -68,13 +63,13 @@ const MapPage: React.FC = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                    className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                       activeTab === tab.id
-                        ? 'bg-climate-500 text-white shadow-lg'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
+                        : 'text-slate-500 hover:text-slate-300'
                     }`}
                   >
-                    <tab.icon className="h-4 w-4" />
+                    <tab.icon className="h-3.5 w-3.5" />
                     {tab.label}
                   </button>
                 ))}
@@ -82,216 +77,162 @@ const MapPage: React.FC = () => {
 
               {/* Tab Content */}
               {activeTab === 'details' && (
-                <div className="space-y-3 animate-fade-in">
+                <div className="space-y-3 animate-fade-in-up">
                   {/* Temperature */}
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-50 to-red-50 border border-orange-100">
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/[0.06] to-red-500/[0.03] border border-orange-500/10">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-orange-100 rounded-xl">
-                          <Thermometer className="h-5 w-5 text-orange-500" />
+                        <div className="w-9 h-9 rounded-xl bg-orange-500/15 flex items-center justify-center">
+                          <Thermometer className="h-4 w-4 text-orange-400" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500">Temperature</p>
-                          <p className="text-xs text-gray-400">Feels like {calculateHeatIndex(selectedStationData.temperature, selectedStationData.humidity).toFixed(1)}°C</p>
+                          <p className="text-xs text-slate-400">Temperature</p>
+                          <p className="text-[10px] text-slate-600">Feels like {calculateHeatIndex(selectedStationData.temperature, selectedStationData.humidity).toFixed(1)}°C</p>
                         </div>
                       </div>
-                      <span
-                        className="text-3xl font-bold"
-                        style={{ color: getTemperatureColor(selectedStationData.temperature) }}
-                      >
+                      <span className="text-2xl font-bold" style={{ color: getTemperatureColor(selectedStationData.temperature) }}>
                         {selectedStationData.temperature.toFixed(1)}°C
                       </span>
                     </div>
                   </div>
 
                   {/* Humidity */}
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-100">
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/[0.06] to-cyan-500/[0.03] border border-blue-500/10">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-xl">
-                          <Droplets className="h-5 w-5 text-blue-500" />
+                        <div className="w-9 h-9 rounded-xl bg-blue-500/15 flex items-center justify-center">
+                          <Droplets className="h-4 w-4 text-blue-400" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500">Humidity</p>
-                          <p className="text-xs text-gray-400">
-                            {selectedStationData.humidity > 70 ? 'High' : 
-                             selectedStationData.humidity > 40 ? 'Moderate' : 'Low'}
+                          <p className="text-xs text-slate-400">Humidity</p>
+                          <p className="text-[10px] text-slate-600">
+                            {selectedStationData.humidity > 70 ? 'High' : selectedStationData.humidity > 40 ? 'Moderate' : 'Low'}
                           </p>
                         </div>
                       </div>
-                      <span className="text-3xl font-bold text-blue-600">
-                        {selectedStationData.humidity.toFixed(0)}%
-                      </span>
+                      <span className="text-2xl font-bold text-blue-400">{selectedStationData.humidity.toFixed(0)}%</span>
                     </div>
                   </div>
 
                   {/* Wind */}
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-gray-50 to-slate-50 border border-gray-200">
+                  <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-500/[0.06] to-gray-500/[0.03] border border-white/[0.06]">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gray-200 rounded-xl">
-                          <Wind className="h-5 w-5 text-gray-600" />
+                        <div className="w-9 h-9 rounded-xl bg-white/[0.06] flex items-center justify-center">
+                          <Wind className="h-4 w-4 text-slate-400" />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500">Wind Speed</p>
-                          <p className="text-xs text-gray-400">Direction: N/A</p>
+                          <p className="text-xs text-slate-400">Wind Speed</p>
+                          <p className="text-[10px] text-slate-600">Direction: N/A</p>
                         </div>
                       </div>
-                      <span className="text-3xl font-bold text-gray-700">
-                        {selectedStationData.wind_speed.toFixed(1)}
-                        <span className="text-lg">km/h</span>
+                      <span className="text-2xl font-bold text-slate-300">
+                        {selectedStationData.wind_speed.toFixed(1)}<span className="text-sm"> km/h</span>
                       </span>
                     </div>
                   </div>
 
                   {/* AQI */}
-                  <div className="p-4 rounded-2xl border" style={{ 
-                    background: `linear-gradient(135deg, ${getAQIColor(selectedStationData.aqi)}10, ${getAQIColor(selectedStationData.aqi)}05)`,
-                    borderColor: `${getAQIColor(selectedStationData.aqi)}30`
-                  }}>
+                  <div className="p-4 rounded-2xl border" style={{ background: `linear-gradient(135deg, ${getAQIColor(selectedStationData.aqi)}08, ${getAQIColor(selectedStationData.aqi)}03)`, borderColor: `${getAQIColor(selectedStationData.aqi)}20` }}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl" style={{ backgroundColor: `${getAQIColor(selectedStationData.aqi)}20` }}>
-                          <Activity className="h-5 w-5" style={{ color: getAQIColor(selectedStationData.aqi) }} />
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${getAQIColor(selectedStationData.aqi)}15` }}>
+                          <Activity className="h-4 w-4" style={{ color: getAQIColor(selectedStationData.aqi) }} />
                         </div>
                         <div>
-                          <p className="text-sm text-gray-500">Air Quality Index</p>
-                          <p className="text-xs" style={{ color: getAQIColor(selectedStationData.aqi) }}>
-                            {selectedStationData.aqi <= 50 ? 'Good' :
-                             selectedStationData.aqi <= 100 ? 'Moderate' :
-                             selectedStationData.aqi <= 150 ? 'Unhealthy for Sensitive' :
-                             'Unhealthy'}
+                          <p className="text-xs text-slate-400">Air Quality Index</p>
+                          <p className="text-[10px]" style={{ color: getAQIColor(selectedStationData.aqi) }}>
+                            {selectedStationData.aqi <= 50 ? 'Good' : selectedStationData.aqi <= 100 ? 'Moderate' : selectedStationData.aqi <= 150 ? 'Sensitive' : 'Unhealthy'}
                           </p>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-end gap-2">
-                      <span className="text-4xl font-bold" style={{ color: getAQIColor(selectedStationData.aqi) }}>
-                        {selectedStationData.aqi}
-                      </span>
-                      <span className="text-sm text-gray-500 mb-1">AQI</span>
+                      <span className="text-3xl font-bold" style={{ color: getAQIColor(selectedStationData.aqi) }}>{selectedStationData.aqi}</span>
+                      <span className="text-xs text-slate-500 mb-1">AQI</span>
                     </div>
-                    {/* AQI Bar */}
-                    <div className="mt-3 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full rounded-full transition-all duration-1000"
-                        style={{ 
-                          width: `${Math.min(100, (selectedStationData.aqi / 300) * 100)}%`,
-                          backgroundColor: getAQIColor(selectedStationData.aqi)
-                        }}
-                      ></div>
+                    <div className="mt-3 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${Math.min(100, (selectedStationData.aqi / 300) * 100)}%`, backgroundColor: getAQIColor(selectedStationData.aqi) }}></div>
                     </div>
                   </div>
 
-                  {/* Timestamp */}
-                  <div className="text-center pt-3">
-                    <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
-                      <Activity className="h-3 w-3" />
-                      Last updated: {formatDateTime(selectedStationData.timestamp)}
+                  <div className="text-center pt-2">
+                    <p className="text-[10px] text-slate-600 flex items-center justify-center gap-1">
+                      <Activity className="h-2.5 w-2.5" /> {formatDateTime(selectedStationData.timestamp)}
                     </p>
                   </div>
                 </div>
               )}
 
               {activeTab === 'comparison' && (
-                <div className="animate-fade-in">
-                  <p className="text-sm text-gray-500 mb-4">Compare this station with others:</p>
-                  <div className="space-y-2">
-                    {realtimeData
-                      .filter(s => s.station_id !== selectedStation)
-                      .slice(0, 5)
-                      .map(station => (
-                        <div 
-                          key={station.station_id}
-                          className="p-3 rounded-xl border border-gray-100 hover:border-climate-200 hover:bg-climate-50 transition-all cursor-pointer"
-                          onClick={() => setSelectedStation(station.station_id)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-medium text-gray-900 truncate">
-                              {station.station_name}
-                            </span>
-                            <span className="text-sm font-bold" style={{ color: getTemperatureColor(station.temperature) }}>
-                              {station.temperature.toFixed(1)}°C
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
+                <div className="animate-fade-in-up space-y-2">
+                  {realtimeData.filter(s => s.station_id !== selectedStation).slice(0, 5).map(station => (
+                    <div key={station.station_id} className="p-3 rounded-xl border border-white/[0.04] hover:border-emerald-500/20 hover:bg-white/[0.03] transition-all cursor-pointer" onClick={() => setSelectedStation(station.station_id)}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-slate-300 truncate">{station.station_name}</span>
+                        <span className="text-xs font-bold" style={{ color: getTemperatureColor(station.temperature) }}>{station.temperature.toFixed(1)}°C</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
               {activeTab === 'history' && (
-                <div className="animate-fade-in">
-                  <p className="text-sm text-gray-500 mb-4">Historical data for this station:</p>
-                  <div className="space-y-3">
-                    {[
-                      { label: 'Today', temp: selectedStationData.temperature, change: '+2.1°C' },
-                      { label: 'Yesterday', temp: selectedStationData.temperature - 1.5, change: '-0.8°C' },
-                      { label: 'Last Week', temp: selectedStationData.temperature - 3, change: '-1.2°C' },
-                    ].map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
-                        <span className="text-sm text-gray-600">{item.label}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-gray-900">{item.temp.toFixed(1)}°C</span>
-                          <span className={`text-xs font-medium ${
-                            item.change.startsWith('+') ? 'text-red-500' : 'text-green-500'
-                          }`}>
-                            {item.change}
-                          </span>
-                        </div>
+                <div className="animate-fade-in-up space-y-2.5">
+                  {[
+                    { label: 'Today', temp: selectedStationData.temperature, change: '+2.1°C' },
+                    { label: 'Yesterday', temp: selectedStationData.temperature - 1.5, change: '-0.8°C' },
+                    { label: 'Last Week', temp: selectedStationData.temperature - 3, change: '-1.2°C' },
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.04]">
+                      <span className="text-xs text-slate-400">{item.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-sm text-white">{item.temp.toFixed(1)}°C</span>
+                        <span className={`text-[10px] font-bold ${item.change.startsWith('+') ? 'text-red-400' : 'text-emerald-400'}`}>{item.change}</span>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
           ) : (
-            <div className="card text-center py-12">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-float">
-                <Info className="h-8 w-8 text-gray-300" />
+            <div className="card text-center py-10">
+              <div className="w-14 h-14 bg-white/[0.04] rounded-2xl flex items-center justify-center mx-auto mb-4 animate-float border border-white/[0.06]">
+                <Info className="h-7 w-7 text-slate-600" />
               </div>
-              <p className="text-gray-500 font-medium">Click on a station marker</p>
-              <p className="text-sm text-gray-400 mt-1">to view detailed weather data</p>
+              <p className="text-slate-400 font-medium text-sm">Click a station marker</p>
+              <p className="text-xs text-slate-600 mt-1">to view detailed weather data</p>
             </div>
           )}
 
           {/* Station List */}
-          <div className="card hover-lift">
-            <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Globe className="h-4 w-4 text-climate-500" />
+          <div className="card">
+            <h3 className="text-xs font-bold text-white mb-4 flex items-center gap-2 uppercase tracking-wider">
+              <Globe className="h-3.5 w-3.5 text-emerald-400" />
               All Stations
             </h3>
-            <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+            <div className="space-y-1.5 max-h-80 overflow-y-auto pr-1">
               {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="skeleton h-20 rounded-xl"></div>
-                ))
+                Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton h-16 rounded-xl"></div>)
               ) : (
                 realtimeData.map((station) => (
                   <button
                     key={station.station_id}
                     onClick={() => setSelectedStation(station.station_id)}
-                    className={`w-full text-left p-4 rounded-xl transition-all duration-200 ${
+                    className={`w-full text-left p-3 rounded-xl transition-all duration-200 ${
                       selectedStation === station.station_id
-                        ? 'bg-climate-50 border-2 border-climate-300 shadow-md'
-                        : 'hover:bg-gray-50 border-2 border-transparent hover:border-gray-200'
+                        ? 'bg-emerald-500/[0.08] border border-emerald-500/20'
+                        : 'hover:bg-white/[0.03] border border-transparent hover:border-white/[0.06]'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-3 h-3 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: getTemperatureColor(station.temperature) }}
-                      ></div>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: getTemperatureColor(station.temperature) }}></div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm font-semibold text-gray-900 block truncate">
-                          {station.station_name}
-                        </span>
-                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                        <span className="text-xs font-semibold text-white block truncate">{station.station_name}</span>
+                        <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-500">
                           <span className="font-medium">{station.temperature.toFixed(1)}°C</span>
                           <span>{station.humidity.toFixed(0)}%</span>
-                          <span className="font-medium" style={{ color: getAQIColor(station.aqi) }}>
-                            AQI {station.aqi}
-                          </span>
+                          <span style={{ color: getAQIColor(station.aqi) }}>AQI {station.aqi}</span>
                         </div>
                       </div>
                     </div>

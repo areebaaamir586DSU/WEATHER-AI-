@@ -14,6 +14,8 @@ import {
   Bell,
   Shield,
   Zap,
+  Snowflake,
+  Sun,
 } from 'lucide-react';
 
 interface AlertCardProps {
@@ -24,129 +26,136 @@ interface AlertCardProps {
 
 const getAlertIcon = (type: string) => {
   switch (type) {
-    case 'heatwave':
-    case 'cold_snap':
-      return <Thermometer className="h-5 w-5" />;
-    case 'flood':
-    case 'drought':
-      return <Droplets className="h-5 w-5" />;
-    case 'storm':
-      return <Wind className="h-5 w-5" />;
-    case 'air_quality':
-      return <CloudRain className="h-5 w-5" />;
+    case 'heatwave': return <Sun className="h-5 w-5" />;
+    case 'cold_snap': return <Snowflake className="h-5 w-5" />;
+    case 'flood': return <Droplets className="h-5 w-5" />;
+    case 'drought': return <Droplets className="h-5 w-5" />;
+    case 'storm': return <Wind className="h-5 w-5" />;
+    case 'air_quality': return <CloudRain className="h-5 w-5" />;
+    default: return <AlertTriangle className="h-5 w-5" />;
+  }
+};
+
+const getAlertStyles = (severity: string) => {
+  switch (severity) {
+    case 'low':
+      return {
+        bg: 'from-emerald-500/[0.08] to-cyan-500/[0.04]',
+        border: 'border-emerald-500/20',
+        iconBg: 'bg-emerald-500/15 text-emerald-400',
+        glow: 'shadow-emerald-500/5',
+      };
+    case 'medium':
+      return {
+        bg: 'from-amber-500/[0.08] to-yellow-500/[0.04]',
+        border: 'border-amber-500/20',
+        iconBg: 'bg-amber-500/15 text-amber-400',
+        glow: 'shadow-amber-500/5',
+      };
+    case 'high':
+      return {
+        bg: 'from-orange-500/[0.08] to-red-500/[0.04]',
+        border: 'border-orange-500/20',
+        iconBg: 'bg-orange-500/15 text-orange-400',
+        glow: 'shadow-orange-500/5',
+      };
+    case 'critical':
+      return {
+        bg: 'from-red-500/[0.1] to-rose-500/[0.05]',
+        border: 'border-red-500/25',
+        iconBg: 'bg-red-500/15 text-red-400',
+        glow: 'shadow-red-500/10',
+      };
     default:
-      return <AlertTriangle className="h-5 w-5" />;
-  }
-};
-
-const getAlertColor = (severity: string) => {
-  switch (severity) {
-    case 'low': return 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200';
-    case 'medium': return 'bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200';
-    case 'high': return 'bg-gradient-to-r from-orange-50 to-red-50 border-orange-200';
-    case 'critical': return 'bg-gradient-to-r from-red-50 to-rose-50 border-red-200';
-    default: return 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-200';
-  }
-};
-
-const getIconBg = (severity: string) => {
-  switch (severity) {
-    case 'low': return 'bg-green-100 text-green-600';
-    case 'medium': return 'bg-yellow-100 text-yellow-600';
-    case 'high': return 'bg-orange-100 text-orange-600';
-    case 'critical': return 'bg-red-100 text-red-600';
-    default: return 'bg-gray-100 text-gray-600';
+      return {
+        bg: 'from-slate-500/[0.08] to-gray-500/[0.04]',
+        border: 'border-slate-500/20',
+        iconBg: 'bg-slate-500/15 text-slate-400',
+        glow: 'shadow-slate-500/5',
+      };
   }
 };
 
 export const AlertCard: React.FC<AlertCardProps> = ({ alert, onResolve, compact = false }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const styles = getAlertStyles(alert.severity);
 
   return (
-    <div className={`rounded-2xl border p-5 ${getAlertColor(alert.severity)} ${
-      !alert.is_active ? 'opacity-60' : ''
-    } transition-all duration-300 hover:shadow-lg`}>
-      <div className="flex items-start gap-4">
-        <div className={`p-3 rounded-2xl ${getIconBg(alert.severity)} transform transition-all duration-300 hover:scale-110 hover:rotate-3 shadow-md`}>
-          {getAlertIcon(alert.alert_type)}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h4 className="font-bold text-gray-900">{alert.title}</h4>
-            <span className={getSeverityBadgeClass(alert.severity)}>
-              {alert.severity}
-            </span>
-            {!alert.is_active && (
-              <span className="badge bg-gray-100 text-gray-600 flex items-center gap-1">
-                <CheckCircle className="h-3 w-3" />
-                Resolved
-              </span>
-            )}
+    <div className={`rounded-2xl border bg-gradient-to-r ${styles.bg} ${styles.border} ${
+      !alert.is_active ? 'opacity-50' : ''
+    } transition-all duration-300 hover:shadow-xl ${styles.glow}`}>
+      <div className="p-5">
+        <div className="flex items-start gap-4">
+          <div className={`w-11 h-11 rounded-2xl ${styles.iconBg} flex items-center justify-center flex-shrink-0 transition-transform duration-300 hover:scale-110 hover:rotate-6`}>
+            {getAlertIcon(alert.alert_type)}
           </div>
-          
-          {!compact && (
-            <>
-              <p className="mt-2.5 text-sm text-gray-600 leading-relaxed">{alert.message}</p>
-              
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center gap-1.5 mt-3 text-xs font-semibold text-gray-500 hover:text-climate-600 transition-colors"
-              >
-                {isExpanded ? (
-                  <>
-                    <ChevronUp className="h-3.5 w-3.5" />
-                    Show less
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="h-3.5 w-3.5" />
-                    Show more details
-                  </>
-                )}
-              </button>
-              
-              {isExpanded && (
-                <div className="mt-4 p-4 bg-white/60 backdrop-blur-sm rounded-2xl space-y-3 animate-fade-in">
-                  <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                    <Bell className="h-3.5 w-3.5 text-climate-500" />
-                    <span>Alert Type: <span className="font-semibold text-gray-700 capitalize">{alert.alert_type.replace('_', ' ')}</span></span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                    <Shield className="h-3.5 w-3.5 text-purple-500" />
-                    <span>Severity: <span className="font-semibold text-gray-700 capitalize">{alert.severity}</span></span>
-                  </div>
-                  <div className="flex items-center gap-2.5 text-xs text-gray-500">
-                    <Clock className="h-3.5 w-3.5 text-blue-500" />
-                    <span>Created: <span className="font-semibold text-gray-700">{formatDate(alert.created_at)}</span></span>
-                  </div>
-                </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h4 className="font-bold text-white text-sm">{alert.title}</h4>
+              <span className={getSeverityBadgeClass(alert.severity)}>
+                {alert.severity}
+              </span>
+              {!alert.is_active && (
+                <span className="badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3" />
+                  Resolved
+                </span>
               )}
-            </>
-          )}
-          
-          <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
-            <span className="flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" />
-              {formatDate(alert.created_at)}
-            </span>
+            </div>
+
             {!compact && (
-              <span className="capitalize flex items-center gap-1.5">
-                <Zap className="h-3.5 w-3.5" />
-                {alert.alert_type.replace('_', ' ')}
-              </span>
+              <>
+                <p className="mt-2 text-sm text-slate-400 leading-relaxed">{alert.message}</p>
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="flex items-center gap-1.5 mt-3 text-xs font-semibold text-slate-500 hover:text-emerald-400 transition-colors"
+                >
+                  {isExpanded ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+                  {isExpanded ? 'Show less' : 'Show more'}
+                </button>
+                {isExpanded && (
+                  <div className="mt-4 p-4 bg-white/[0.03] rounded-2xl space-y-3 animate-fade-in-up border border-white/[0.04]">
+                    <div className="flex items-center gap-2.5 text-xs text-slate-400">
+                      <Bell className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>Type: <span className="font-semibold text-slate-300 capitalize">{alert.alert_type.replace('_', ' ')}</span></span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-400">
+                      <Shield className="h-3.5 w-3.5 text-purple-400" />
+                      <span>Severity: <span className="font-semibold text-slate-300 capitalize">{alert.severity}</span></span>
+                    </div>
+                    <div className="flex items-center gap-2.5 text-xs text-slate-400">
+                      <Clock className="h-3.5 w-3.5 text-blue-400" />
+                      <span>Created: <span className="font-semibold text-slate-300">{formatDate(alert.created_at)}</span></span>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
+
+            <div className="flex items-center gap-4 mt-3 text-xs text-slate-500">
+              <span className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" />
+                {formatDate(alert.created_at)}
+              </span>
+              {!compact && (
+                <span className="capitalize flex items-center gap-1.5">
+                  <Zap className="h-3.5 w-3.5" />
+                  {alert.alert_type.replace('_', ' ')}
+                </span>
+              )}
+            </div>
           </div>
+
+          {alert.is_active && onResolve && (
+            <button
+              onClick={() => onResolve(alert.id)}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold bg-white/[0.06] text-slate-300 rounded-2xl border border-white/[0.08] hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/30 transition-all duration-300 flex-shrink-0"
+            >
+              <CheckCircle className="h-4 w-4" />
+              Resolve
+            </button>
+          )}
         </div>
-        
-        {alert.is_active && onResolve && (
-          <button
-            onClick={() => onResolve(alert.id)}
-            className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold bg-white rounded-2xl border-2 border-gray-200 hover:bg-climate-50 hover:border-climate-400 hover:text-climate-600 transition-all duration-300 shadow-sm hover:shadow-lg"
-          >
-            <CheckCircle className="h-4 w-4" />
-            Resolve
-          </button>
-        )}
       </div>
     </div>
   );
@@ -169,22 +178,22 @@ export const AlertList: React.FC<AlertListProps> = ({
 
   if (displayAlerts.length === 0) {
     return (
-      <div className="text-center py-10">
-        <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-5 animate-float">
-          <CheckCircle className="h-10 w-10 text-green-500" />
+      <div className="text-center py-12">
+        <div className="w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 rounded-3xl flex items-center justify-center mx-auto mb-5 animate-float border border-emerald-500/10">
+          <CheckCircle className="h-10 w-10 text-emerald-400" />
         </div>
-        <p className="text-gray-700 font-bold text-lg">All Clear!</p>
-        <p className="text-sm text-gray-400 mt-1">No active alerts at this time</p>
+        <p className="text-white font-bold text-lg">All Clear!</p>
+        <p className="text-sm text-slate-400 mt-1">No active alerts at this time</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {displayAlerts.map((alert, index) => (
         <div
           key={alert.id}
-          className="animate-slide-up"
+          className="animate-fade-in-up opacity-0"
           style={{ animationDelay: `${index * 0.05}s` }}
         >
           <AlertCard
@@ -209,39 +218,30 @@ export const AlertStats: React.FC<AlertStatsProps> = ({ alerts }) => {
   const mediumCount = activeAlerts.filter(a => a.severity === 'medium').length;
   const lowCount = activeAlerts.filter(a => a.severity === 'low').length;
 
+  const stats = [
+    { label: 'Critical', count: criticalCount, gradient: 'from-red-500/10 to-rose-500/5', border: 'border-red-500/15', dot: 'bg-red-400', text: 'text-red-400', pulse: criticalCount > 0 },
+    { label: 'High', count: highCount, gradient: 'from-orange-500/10 to-amber-500/5', border: 'border-orange-500/15', dot: 'bg-orange-400', text: 'text-orange-400', pulse: false },
+    { label: 'Medium', count: mediumCount, gradient: 'from-amber-500/10 to-yellow-500/5', border: 'border-amber-500/15', dot: 'bg-amber-400', text: 'text-amber-400', pulse: false },
+    { label: 'Low', count: lowCount, gradient: 'from-emerald-500/10 to-cyan-500/5', border: 'border-emerald-500/15', dot: 'bg-emerald-400', text: 'text-emerald-400', pulse: false },
+  ];
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <div className="p-4 rounded-2xl bg-gradient-to-br from-red-50 to-rose-50 border border-red-100 hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-105">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="relative">
-            <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
-            {criticalCount > 0 && <div className="absolute inset-0 w-2.5 h-2.5 bg-red-500 rounded-full animate-ping"></div>}
+      {stats.map((stat) => (
+        <div
+          key={stat.label}
+          className={`p-4 rounded-2xl bg-gradient-to-br ${stat.gradient} border ${stat.border} hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.02]`}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <div className="relative">
+              <div className={`w-2.5 h-2.5 rounded-full ${stat.dot}`}></div>
+              {stat.pulse && <div className={`absolute inset-0 w-2.5 h-2.5 rounded-full ${stat.dot} animate-ping opacity-50`}></div>}
+            </div>
+            <p className={`text-[10px] font-bold ${stat.text} uppercase tracking-wider`}>{stat.label}</p>
           </div>
-          <p className="text-xs font-bold text-red-600 uppercase tracking-wider">Critical</p>
+          <p className={`text-3xl font-bold ${stat.text}`}>{stat.count}</p>
         </div>
-        <p className="text-3xl font-bold text-red-700">{criticalCount}</p>
-      </div>
-      <div className="p-4 rounded-2xl bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-100 hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-105">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-2.5 h-2.5 bg-orange-500 rounded-full"></div>
-          <p className="text-xs font-bold text-orange-600 uppercase tracking-wider">High</p>
-        </div>
-        <p className="text-3xl font-bold text-orange-700">{highCount}</p>
-      </div>
-      <div className="p-4 rounded-2xl bg-gradient-to-br from-yellow-50 to-amber-50 border border-yellow-100 hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-105">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-2.5 h-2.5 bg-yellow-500 rounded-full"></div>
-          <p className="text-xs font-bold text-yellow-600 uppercase tracking-wider">Medium</p>
-        </div>
-        <p className="text-3xl font-bold text-yellow-700">{mediumCount}</p>
-      </div>
-      <div className="p-4 rounded-2xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100 hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-105">
-        <div className="flex items-center gap-2 mb-2">
-          <div className="w-2.5 h-2.5 bg-green-500 rounded-full"></div>
-          <p className="text-xs font-bold text-green-600 uppercase tracking-wider">Low</p>
-        </div>
-        <p className="text-3xl font-bold text-green-700">{lowCount}</p>
-      </div>
+      ))}
     </div>
   );
 };

@@ -10,6 +10,7 @@ import {
   Menu,
   X,
   ChevronRight,
+  Waves,
   Sun,
   Moon,
 } from 'lucide-react';
@@ -19,24 +20,21 @@ interface LayoutProps {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard, color: 'from-climate-400 to-emerald-500' },
-  { name: 'Map View', href: '/map', icon: Map, color: 'from-blue-400 to-indigo-500' },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3, color: 'from-purple-400 to-pink-500' },
-  { name: 'Alerts', href: '/alerts', icon: Bell, color: 'from-red-400 to-rose-500' },
-  { name: 'Stations', href: '/stations', icon: Globe, color: 'from-orange-400 to-amber-500' },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard, gradient: 'from-emerald-400 to-cyan-400' },
+  { name: 'Map View', href: '/map', icon: Map, gradient: 'from-blue-400 to-indigo-400' },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3, gradient: 'from-purple-400 to-pink-400' },
+  { name: 'Alerts', href: '/alerts', icon: Bell, gradient: 'from-orange-400 to-red-400' },
+  { name: 'Stations', href: '/stations', icon: Globe, gradient: 'from-cyan-400 to-blue-400' },
 ];
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [time, setTime] = useState(new Date());
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -44,121 +42,97 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Top Navigation */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-white/95 backdrop-blur-xl shadow-xl shadow-gray-200/50 border-b border-gray-100' 
-          : 'bg-white/80 backdrop-blur-sm border-b border-gray-100/50'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link to="/" className="flex items-center gap-3 group">
-                <div className="relative">
-                  <div className="p-2.5 bg-gradient-to-br from-climate-500 to-emerald-500 rounded-2xl shadow-lg shadow-climate-500/30 group-hover:shadow-climate-500/50 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3">
-                    <Activity className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
-                </div>
-                <div>
-                  <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-climate-600 via-emerald-500 to-teal-500">
-                    Climate Monitor
-                  </span>
-                  <span className="hidden sm:block text-[10px] text-gray-400 font-medium tracking-wider uppercase">
-                    Global Weather Intelligence
-                  </span>
-                </div>
-              </Link>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navigation.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                      isActive
-                        ? 'bg-white text-gray-900 shadow-lg shadow-gray-200/50'
-                        : 'text-gray-500 hover:bg-white/50 hover:text-gray-900'
-                    }`}
-                  >
-                    {isActive && (
-                      <div className={`absolute inset-0 bg-gradient-to-r ${item.color} opacity-10 rounded-xl`}></div>
-                    )}
-                    <item.icon className={`h-4 w-4 relative z-10 ${
-                      isActive ? `bg-clip-text text-transparent bg-gradient-to-r ${item.color}` : ''
-                    }`} />
-                    <span className="relative z-10">{item.name}</span>
-                    {isActive && (
-                      <ChevronRight className="h-3 w-3 text-gray-400 relative z-10" />
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            {/* Right Side */}
-            <div className="flex items-center gap-3">
-              {/* Live Indicator */}
-              <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-full border border-green-200/50">
-                <div className="relative">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
-                </div>
-                <span className="text-xs font-bold text-green-700">LIVE</span>
+    <div className="min-h-screen flex">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex fixed left-0 top-0 bottom-0 w-[72px] xl:w-[260px] flex-col glass-strong z-50 border-r border-white/[0.06]">
+        {/* Logo */}
+        <div className="p-4 xl:p-5 border-b border-white/[0.06]">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:shadow-emerald-500/40 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 flex-shrink-0">
+              <Activity className="h-5 w-5 text-white" />
+              <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#111827]">
+                <div className="absolute inset-0 rounded-full bg-emerald-400 animate-ping opacity-50"></div>
               </div>
+            </div>
+            <div className="hidden xl:block">
+              <span className="text-base font-bold gradient-text">Climate</span>
+              <span className="text-[10px] block text-slate-500 font-medium tracking-wider uppercase mt-0.5">Monitoring System</span>
+            </div>
+          </Link>
+        </div>
 
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
+        {/* Navigation */}
+        <nav className="flex-1 p-3 xl:p-4 space-y-1.5">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.name}
+                to={item.href}
+                className={`relative flex items-center gap-3 px-3 xl:px-4 py-3 rounded-2xl transition-all duration-300 group ${
+                  isActive
+                    ? 'bg-gradient-to-r ' + item.gradient + ' text-white shadow-lg'
+                    : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                }`}
+                style={isActive ? { boxShadow: `0 8px 30px rgba(16, 185, 129, 0.15)` } : {}}
               >
-                {isMobileMenuOpen ? (
-                  <X className="h-6 w-6 text-gray-600" />
-                ) : (
-                  <Menu className="h-6 w-6 text-gray-600" />
+                {isActive && (
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r opacity-20" style={{background: `linear-gradient(135deg, ${item.gradient.includes('emerald') ? '#10b981' : item.gradient.includes('blue') ? '#3b82f6' : item.gradient.includes('purple') ? '#8b5cf6' : item.gradient.includes('orange') ? '#f59e0b' : '#06b6d4'}, transparent)`}}></div>
                 )}
-              </button>
+                <item.icon className={`h-5 w-5 relative z-10 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
+                <span className="hidden xl:block relative z-10 font-semibold text-sm">{item.name}</span>
+                {isActive && (
+                  <ChevronRight className="h-4 w-4 ml-auto relative z-10 opacity-60" />
+                )}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Bottom section */}
+        <div className="p-3 xl:p-4 border-t border-white/[0.06] space-y-3">
+          {/* Live Status */}
+          <div className="hidden xl:flex items-center gap-3 px-4 py-3 rounded-2xl bg-emerald-500/[0.08] border border-emerald-500/[0.15]">
+            <div className="pulse-dot flex-shrink-0"></div>
+            <div>
+              <p className="text-xs font-bold text-emerald-400">LIVE</p>
+              <p className="text-[10px] text-emerald-400/60">20 stations online</p>
             </div>
           </div>
-        </div>
-      </header>
+          <div className="lg:flex xl:hidden items-center justify-center py-2">
+            <div className="pulse-dot"></div>
+          </div>
 
-      {/* Mobile Navigation */}
-      <div className={`md:hidden fixed inset-0 z-40 transition-all duration-300 ${
-        isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-      }`}>
-        {/* Backdrop */}
-        <div 
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-          onClick={() => setIsMobileMenuOpen(false)}
-        ></div>
-        
-        {/* Menu Panel */}
-        <div className={`absolute right-0 top-0 h-full w-80 bg-white shadow-2xl transition-transform duration-500 ${
-          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}>
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-gradient-to-br from-climate-500 to-emerald-500 rounded-2xl">
-                  <Activity className="h-5 w-5 text-white" />
-                </div>
-                <span className="font-bold text-gray-900">Navigation</span>
-              </div>
-              <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                <X className="h-5 w-5 text-gray-500" />
-              </button>
+          {/* Time */}
+          <div className="hidden xl:block text-center text-xs text-slate-500 font-mono">
+            {time.toLocaleTimeString()}
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 glass-strong border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <Activity className="h-4 w-4 text-white" />
             </div>
-            
+            <span className="text-sm font-bold gradient-text">Climate Monitor</span>
+          </Link>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-xl hover:bg-white/[0.05] transition-colors"
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5 text-white" /> : <Menu className="h-5 w-5 text-white" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      <div className={`lg:hidden fixed inset-0 z-40 transition-all duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)}></div>
+        <div className={`absolute right-0 top-0 h-full w-72 glass-strong border-l border-white/[0.06] transition-transform duration-500 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="p-6 pt-20">
             <nav className="space-y-2">
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -168,65 +142,26 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     to={item.href}
                     className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 ${
                       isActive
-                        ? `bg-gradient-to-r ${item.color} text-white font-semibold shadow-lg`
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? `bg-gradient-to-r ${item.gradient} text-white font-semibold shadow-lg`
+                        : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
                     }`}
                   >
-                    <item.icon className={`h-5 w-5 ${isActive ? 'text-white' : ''}`} />
-                    {item.name}
-                    {isActive && (
-                      <ChevronRight className="h-4 w-4 ml-auto" />
-                    )}
+                    <item.icon className="h-5 w-5" />
+                    <span className="font-medium">{item.name}</span>
                   </Link>
                 );
               })}
             </nav>
-            
-            {/* Mobile Live Status */}
-            <div className="mt-8 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl border border-green-200/50">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <div className="absolute inset-0 w-3 h-3 bg-green-500 rounded-full animate-ping"></div>
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-green-700">System Online</p>
-                  <p className="text-xs text-green-600">Real-time monitoring active</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
-        {children}
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-climate-500 to-emerald-500 rounded-xl">
-                <Activity className="h-4 w-4 text-white" />
-              </div>
-              <span className="text-sm font-semibold text-gray-600">
-                Climate Monitoring & Mapping System
-              </span>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-gray-400">
-              <span className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                Real-time data from 20 stations
-              </span>
-              <span>•</span>
-              <span>Updated every 30 seconds</span>
-            </div>
-          </div>
+      <main className="flex-1 lg:ml-[72px] xl:ml-[260px] pt-16 lg:pt-0">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
+          {children}
         </div>
-      </footer>
+      </main>
     </div>
   );
 };
